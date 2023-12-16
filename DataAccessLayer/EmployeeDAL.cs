@@ -14,7 +14,7 @@ namespace EmpManagement.DataAccessLayer
             ConnectionString = ConfigurationManager.ConnectionStrings["EmpConnectionString"].ToString();
         }
 
-        public DataTable getAllEmployee(int PageSize,int PageNumber)
+        public DataTable getAllEmployee(int PageSize, int PageNumber)
         {
             try
             {
@@ -69,7 +69,7 @@ namespace EmpManagement.DataAccessLayer
                 throw;
             }
         }
-            public int SaveEmployee(EmployeeListDTO employeeListDTO)
+        public int SaveEmployee(EmployeeListDTO employeeListDTO)
         {
             try
             {
@@ -80,7 +80,7 @@ namespace EmpManagement.DataAccessLayer
                     {
                         sqlCmd.Connection = connection;
                         sqlCmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        sqlCmd.CommandText = "dbo.uspSaveEmployeeDetails";
+                        sqlCmd.CommandText = @"dbo.uspSaveEmployeeDetails";
                         sqlCmd.Parameters.Add("EmployeeName", SqlDbType.VarChar).Value = employeeListDTO.EmployeeName;
                         sqlCmd.Parameters.Add("EmployeeEmail", SqlDbType.VarChar).Value = employeeListDTO.EmployeeEmail;
                         sqlCmd.Parameters.Add("EmployeeAddress", SqlDbType.VarChar).Value = employeeListDTO.EmployeeAddress;
@@ -109,7 +109,7 @@ namespace EmpManagement.DataAccessLayer
                     {
                         sqlCmd.Connection = connection;
                         sqlCmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        sqlCmd.CommandText = "dbo.uspUpdateEmployeeDetails";
+                        sqlCmd.CommandText = @"dbo.uspUpdateEmployeeDetails";
                         sqlCmd.Parameters.Add("EmployeeId", SqlDbType.BigInt).Value = employeeListDTO.EmployeeId;
                         sqlCmd.Parameters.Add("EmployeeName", SqlDbType.VarChar).Value = employeeListDTO.EmployeeName;
                         sqlCmd.Parameters.Add("EmployeeEmail", SqlDbType.VarChar).Value = employeeListDTO.EmployeeEmail;
@@ -128,7 +128,7 @@ namespace EmpManagement.DataAccessLayer
             return 0;
         }
 
-        public int DeleteEmployee(int EmployeeId)
+        public int DeleteEmployeeById(int EmployeeId)
         {
             try
             {
@@ -139,7 +139,7 @@ namespace EmpManagement.DataAccessLayer
                     {
                         sqlCmd.Connection = connection;
                         sqlCmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        sqlCmd.CommandText = "dbo.uspDeleteEmployeebyId";
+                        sqlCmd.CommandText = @"dbo.uspDeleteEmployeebyId";
                         sqlCmd.Parameters.Add("EmployeeId", SqlDbType.BigInt).Value = EmployeeId;
 
                         sqlCmd.ExecuteNonQuery();

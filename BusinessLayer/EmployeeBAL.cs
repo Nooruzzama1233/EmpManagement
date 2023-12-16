@@ -91,9 +91,9 @@ namespace EmpManagement.BusinessLayer
             return 0;
         }
 
-        public int DeleteEmployee(int EmployeeId)
+        public int DeleteEmployeeById(int EmployeeId)
         {
-            objEmployeeDAL.DeleteEmployee(EmployeeId);
+            objEmployeeDAL.DeleteEmployeeById(EmployeeId);
             return 0;
         }
 

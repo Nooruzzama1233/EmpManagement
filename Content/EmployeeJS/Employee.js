@@ -3,37 +3,104 @@ $(document).ready(function () {
 
     DisplayData();
 
+    $('#pagination').on('click', '.page-link', function (e) {
+        e.preventDefault();
+
+        var page = $(this).data('page');
+        $.ajax({
+            url: '@Url.Action("Index", "YourController")',
+            type: 'GET',
+            data: { page: page },
+            success: function (data) {
+                $('#dataContainer').html(data);
+            },
+            error: function () {
+                alert('Error occurred while loading data.');
+            }
+        });
+    });
+
     $('#btnSave').click(function () {
 
         //SaveEmpData();
         checkValidate();
     });
 
+
+    $('#btnDeleted').on('click', function () {
+
+        getCheckEmployeeIds();
+    });
+
 });
 
+function checkAllCheckBox() {
+    $('#CheckedAllbox').change(function () {
+        $('.childCheckbox').prop('checked', $(this).prop('checked'));
+    });
+}
+
+function getCheckEmployeeIds() {
+
+    var selectedIDs = [];
+
+    $('#myForm input[type="checkbox"]').each(function () {
+        if ($(this).prop('checked')) {
+            selectedIDs.push($(this).val());
+        }
+    });
+
+    var SeparatedEmployeeIDs = selectedIDs.map(function (item) {
+        return item.slice(0, -1); 
+    });
+    //console.log('Selected IDs:', selectedIDs);
+
+    if (SeparatedEmployeeIDs != null || SeparatedEmployeeIDs !== undefined || SeparatedEmployeeIDs !== '') {
+
+        var EmpData = { EmployeeIds: SeparatedEmployeeIDs };
+
+        $.ajax({
+            url: "/Employee/DeleteEmployees/",
+            data: JSON.stringify(EmpData),
+            type: "POST",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Res) {
+                DisplayData();
+                alert(Res);
+            },
+            error: function (Res) {
+                alert("asa");
+            }
+        });
+    }
+}
+
 function onlyAlphabetsDotsAndSpaces(event) {
-    
+
     var keyCode = event.which || event.keyCode;
-      
-    if ((keyCode >= 65 && keyCode <= 90) ||       
-        (keyCode >= 97 && keyCode <= 122) ||      
-        keyCode === 46 || keyCode === 32) {       
+
+    if ((keyCode >= 65 && keyCode <= 90) ||
+        (keyCode >= 97 && keyCode <= 122) ||
+        keyCode === 46 || keyCode === 32) {
+        document.getElementById('spnName').style.display = "none";
         return true;
-    } else {       
+    } else {
         event.preventDefault();
-        document.getElementById('spnName').innerText = "Invalid Mobile No.";
+        document.getElementById('spnEmail').style.display = "inline";
+        document.getElementById('spnName').innerText = "Invalid Name";
         return false;
     }
 }
 
-function validateEmail() {
+function validateEmail(event) {
     const emailInput = document.getElementById('txtEmail');
     const email = emailInput.value;
 
     const re = /\S+@\S+\.\S+/;
     if (re.test(String(email).toLowerCase())) {
-        //document.getElementById('spnEmail').innerText = "Valid email address";
+        document.getElementById('spnEmail').style.display = "none";
     } else {
+        document.getElementById('spnEmail').style.display = "inline";
         document.getElementById('spnEmail').innerText = "Invalid email address";
     }
 }
@@ -41,8 +108,10 @@ function validateEmail() {
 function onlyNumbersNDot(evt) {
     var evtobj = window.event ? event : evt;
     var charCode = evtobj.charCode ? evtobj.charCode : evtobj.keyCode;
-    if ((charCode > 47 && charCode < 58) || charCode == 8 || charCode == 46 || charCode == 9 || charCode == 10 || charCode == 11)
+    if ((charCode > 47 && charCode < 58) || charCode == 8 || charCode == 46 || charCode == 9 || charCode == 10 || charCode == 11) {
+        document.getElementById('spnMobileNO').style.display = "none";
         return true;
+    }     
     else {
         document.getElementById('spnMobileNO').innerText = "Invalid Mobile No.";
         return false;
@@ -51,22 +120,29 @@ function onlyNumbersNDot(evt) {
 
 function checkValidate() {
 
-    if (($('#txtName').val() == "") && ($('#txtEmail').val() == "") && ($('#txtMobileNo').val()=="") ) {
+    if (($('#txtName').val() == "") && ($('#txtEmail').val() == "") && ($('#txtMobileNo').val() == "")) {
         document.getElementById('spnName').innerText = "Name is required.";
         document.getElementById('spnMobileNO').innerText = "Invalid Mobile No.";
-        document.getElementById('spnEmail').innerText = "Invalid email address";        
+        document.getElementById('spnEmail').innerText = "Invalid email address";
+
+        document.getElementById('spnName').style.display = "inline";
+        document.getElementById('spnMobileNO').style.display = "inline";
+        document.getElementById('spnEmail').style.display = "inline";
         return;
     }
     else if ($('#txtName').val() == "") {
         document.getElementById('spnName').innerText = "Name is required.";
+        document.getElementById('spnName').style.display = "inline";
         return;
     }
     else if ($('#txtEmail').val() == "") {
         document.getElementById('spnEmail').innerText = "Email is required.";
+        document.getElementById('spnEmail').style.display = "inline";
         return;
     }
     else if ($('#txtMobileNo').val() == "") {
         document.getElementById('spnMobileNO').innerText = "Mobile No. is required.";
+        document.getElementById('spnMobileNO').style.display = "inline";
         return;
     } else {
         hideErroeMsg();
@@ -75,9 +151,9 @@ function checkValidate() {
 }
 
 function hideErroeMsg() {
-    document.getElementById('spnName').innerText = "";
-    document.getElementById('spnMobileNO').innerText = "";
-    document.getElementById('spnEmail').innerText = "";
+    document.getElementById('spnName').style.display = "none";
+    document.getElementById('spnMobileNO').style.display = "none";
+    document.getElementById('spnEmail').style.display = "none";
 }
 
 function SaveEmpData() {
@@ -90,14 +166,14 @@ function SaveEmpData() {
 
     var EmpData = { EmployeeId: EmpId, EmployeeName: EmpName, EmployeeEmail: EmpEmail, EmployeeAddress: EmpAddress, EmployeePhone: EmpPhone };
 
-    if (EmpId != null && EmpId.val > 0 ) {
+    if (EmpId != null && EmpId.val > 0) {
 
         $.ajax({
             url: "/Employee/UpdateEmployee/",
             data: EmpData,
             type: "POST",
             success: function (Res) {
-                alert(Res);               
+                alert(Res);
             },
             error: function (Res) {
                 alert("asa");
@@ -113,7 +189,7 @@ function SaveEmpData() {
             type: "POST",
             success: function (Res) {
                 alert(Res);
-               
+
             },
             error: function (Res) {
                 alert("asa");
@@ -122,7 +198,7 @@ function SaveEmpData() {
     }
 
     clearField();
-    DisplayData();    
+    DisplayData();
 }
 
 function clearField() {
@@ -139,10 +215,10 @@ function DisplayData() {
         data: "",
         datatype: "JSON",
         success: function (data) {
-            var tablerow = '';           
+            var tablerow = '';
             $.each(data, function (key, item) {
                 tablerow += "<tr>";
-                tablerow += "<td> <input type='checkbox'/> </td>";
+                tablerow += "<td> <input type='checkbox' id='childCheckbox' class='childCheckbox' value=" + + item.EmployeeId + "/> </td>";
                 //tablerow += "<td>" + item.EmployeeId + "</td>";
                 tablerow += "<td>" + item.EmployeeName + "</td>";
                 tablerow += "<td>" + item.EmployeeEmail + "</td>";
@@ -198,6 +274,7 @@ function deleteEmpData(Sid) {
         data: EmpData,
         type: "POST",
         success: function (Res) {
+            DisplayData();
             alert(Res);
         },
         error: function (Res) {

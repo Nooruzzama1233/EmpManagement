@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-   @* <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">*@
+    @* <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">*@
     <script src="~/Content/EmployeeJS/Employee.js"></script>
 </head>
 <body>
@@ -18,7 +18,11 @@
                 <table style="width:800px;" border="1">
                     <tr>
                         <td colspan="4"><h2>Manage Employee</h2></td>
-                        <td>@Html.ActionLink("Add ", "AddNewStudent", "Employee") </td>
+                        <td>
+                            <button type="button" class="btn btn-primary" id="btnDeleted" onclick="getCheckEmployeeIds();">
+                                Delete
+                            </button>
+                        </td>
                         <td>
                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
                                 Add New Employee
@@ -27,28 +31,36 @@
                     </tr>
                 </table>
             </div>
+            <form id="myForm">
+                <table id="tblEmployeeData" style="width:800px; border:1px; margin-bottom: 10px;">
+                    <tr style="font-family:'Times New Roman', Times, serif; font-size:20px;">
+                        <td> <input type="checkbox" id="CheckedAllbox" onclick="checkAllCheckBox();" /> </td>
+                        <td>Name</td>
+                        <td>Email</td>
+                        <td>Address</td>
+                        <td>Phone</td>
+                        <td>Action</td>
+                    </tr>
 
-            <table style="width:800px; border:1px; margin-bottom: 10px;">
-                <tr style="font-family:'Times New Roman', Times, serif; font-size:20px;">
-                    <td> <input type="checkbox" id="chkAll" /> </td>
-                    <td>Name</td>
-                    <td>Email</td>
-                    <td>Address</td>
-                    <td>Phone</td>
-                    <td>Action</td>
-                </tr>
+                    <tbody id="listStdData">
+                    </tbody>
 
-                <tbody id="listStdData">
-                </tbody>
-                
-            </table>
-
+                </table>
+            </form>
             <div style="background-color: cadetblue;  ">
                 <table style="width:800px;" border="1">
                     <tr>
                         <td colspan="5">Showing <span id="sonCurrentRecord"></span> out of <span id="sonTotalRecord"></span> entries</td>
-                        
-                        <td colspan="2"><button type="button" id="btnPrevious"> Previous</button> <button type="button" id="btnNext"> Next</button></td>
+
+                   
+                        <td> <button type="button" id="btnPrevious"> Previous</button> </td>
+                        <td> @ViewBag.CurrentPage </td>
+                        @*@foreach (var product in Model)
+                        {
+
+                            <td>@product.Id</td> 
+                        }*@
+                        <td> <button type="button" id="btnNext"> Next</button>  </td>
                     </tr>
                 </table>
             </div>
@@ -58,12 +70,12 @@
 
     <div class="modal" id="myModal">
         <div class="modal-dialog">
-            <div class="modal-content">              
+            <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Employee</h4>
                     <button type="button" class="close" data-dismiss="modal" onclick="hideErroeMsg();">&times;</button>
                 </div>
-             
+
                 <div class="modal-body">
                     <div>
                         <h2>Add New Employee</h2>
@@ -76,28 +88,28 @@
 
                                 <h4> Name</h4>
                                 <input type="text" name="txtName" id="txtName" onkeypress="return onlyAlphabetsDotsAndSpaces(event);" />
-                                <span id="spnName" style="display: block; color:red;"></span>
+                                <span id="spnName" style="display: inline; color:red;"></span>
 
                                 <h4> Email</h4>
-                                <input type="text" name="txtEmail" id="txtEmail" onkeypress="return validateEmail();" />
-                                <span id="spnEmail" style="display:block; color:red;"></span>
+                                <input type="text" name="txtEmail" id="txtEmail" onkeypress="return validateEmail(event);" />
+                                <span id="spnEmail" style="display: inline; color: red;"></span>
 
                                 <h4>Address</h4>
                                 <textarea id="txtAddress" rows="2" cols="20"></textarea>
 
                                 <h4>Phone No</h4>
-                                <input id="txtMobileNo" type="text" maxlength="10" onkeypress="return onlyNumbersNDot(event);" />
-                                <span id="spnMobileNO" style="display: block; color: red;"></span>
+                                <input id="txtMobileNo" type="text" min="6" maxlength="10" onkeypress="return onlyNumbersNDot(event);" />
+                                <span id="spnMobileNO" style="display: inline; color: red;"></span>
 
                                 <h4></h4>
                                 <input type="button" id="btnSave" value="Add" />
-                            </div>                            
-                            
+                            </div>
+
                         </div>
                     </div>
                 </div>
 
-                
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="hideErroeMsg();">Close</button>
                 </div>

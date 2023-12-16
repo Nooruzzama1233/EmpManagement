@@ -20,21 +20,31 @@ namespace EmpManagement.Controllers
         }
         public ActionResult Index()
         {
+            int pageSize = 5;
+            int? page = 1;
+            int pageNumber = (page ?? 1);
+            List<EmployeeListDTO> employees = objEmployeeBAL.getAllEmployee(pageSize, pageNumber);
+            var paginatedData = employees.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)employees.Count / pageSize);
+
             return View();
         }
 
-        public JsonResult GetData(int PageSize=5, int PageNumber=1)
+        public JsonResult GetData(int pageSize = 5, int? page = 1)
         {
-            List<EmployeeListDTO> employees = objEmployeeBAL.getAllEmployee(PageSize, PageNumber);
-            return Json(employees, JsonRequestBehavior.AllowGet);            
+            int pageNumber = (page ?? 1);
+            List<EmployeeListDTO> employees = objEmployeeBAL.getAllEmployee(pageSize, pageNumber);           
+
+            return Json(employees, JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult AddNewEmployee(EmployeeListDTO objEmployeeListDTO)
-        {           
+        {
             if (objEmployeeListDTO != null)
             {
                 int rows = objEmployeeBAL.SaveEmployee(objEmployeeListDTO);
-                if(rows==0)
+                if (rows == 0)
                     return Json("Employee Added Successfully.", JsonRequestBehavior.AllowGet);
                 else
                     return Json("Error Occured.", JsonRequestBehavior.AllowGet);
@@ -47,10 +57,10 @@ namespace EmpManagement.Controllers
 
         public JsonResult getEmployeeById(int EmployeeId)
         {
-            if (EmployeeId > 0 )
+            if (EmployeeId > 0)
             {
-                EmployeeListDTO employeesById= objEmployeeBAL.getEmployeeById(EmployeeId);
-                if (employeesById !=null)
+                EmployeeListDTO employeesById = objEmployeeBAL.getEmployeeById(EmployeeId);
+                if (employeesById != null)
                     return Json(employeesById, JsonRequestBehavior.AllowGet);
                 else
                     return Json("Error Occured.", JsonRequestBehavior.AllowGet);
@@ -79,11 +89,36 @@ namespace EmpManagement.Controllers
 
         public JsonResult DeleteEmployee(int EmployeeId)
         {
-           int r = objEmployeeBAL.DeleteEmployee(EmployeeId);
+            int r = 0;
+            if (EmployeeId > 0)
+            {
+                r = objEmployeeBAL.DeleteEmployeeById(EmployeeId);
+            }
+
             if (r == 0)
                 return Json("Employee Deleted Successfully.", JsonRequestBehavior.AllowGet);
             else
-                return Json("Error Occured.", JsonRequestBehavior.AllowGet);            
+                return Json("Error Occured.", JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult DeleteEmployees(string[] EmployeeIds)
+        {
+            int r = 0;
+            int EmployeeId = 0;
+
+            if (EmployeeIds.Length > 0 && EmployeeIds != null)
+            {
+                foreach (string id in EmployeeIds)
+                {
+                    int.TryParse(id, out EmployeeId);
+                    r = objEmployeeBAL.DeleteEmployeeById(EmployeeId);
+                }
+            }
+
+            if (r == 0)
+                return Json("Selected Employees are Deleted Successfully.", JsonRequestBehavior.AllowGet);
+            else
+                return Json("Error Occured.", JsonRequestBehavior.AllowGet);
         }
     }
 }
